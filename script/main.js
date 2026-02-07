@@ -1,16 +1,71 @@
+// Background music controller (starts on timeline start; falls back to first user gesture if blocked)
+const setupBackgroundMusic = () => {
+  const audio = document.getElementById("bgMusic");
+
+  // If no audio element exists, fail gracefully
+  if (!audio) {
+    return { start: async () => false, stop: () => {} };
+  }
+
+  audio.volume = 0.35;
+
+  let started = false;
+
+  const start = async () => {
+    if (started) return true;
+
+    try {
+      await audio.play();
+      started = true;
+      return true;
+    } catch (e) {
+      // Autoplay blocked until user interaction
+      return false;
+    }
+  };
+
+  const stop = () => {
+    audio.pause();
+    started = false;
+  };
+
+  // Fallback: start music on first user gesture (works across browsers, especially mobile Safari)
+  const startOnFirstGesture = async () => {
+    const ok = await start();
+    if (ok) {
+      document.removeEventListener("click", startOnFirstGesture);
+      document.removeEventListener("touchstart", startOnFirstGesture);
+      document.removeEventListener("keydown", startOnFirstGesture);
+    }
+  };
+
+  document.addEventListener("click", startOnFirstGesture);
+  document.addEventListener("touchstart", startOnFirstGesture);
+  document.addEventListener("keydown", startOnFirstGesture);
+
+  return { start, stop };
+};
+
 // Animation Timeline
 const animationTimeline = () => {
-  // Spit chars that needs to be animated individually
+  // Setup music once, try to start exactly when animation begins
+  const music = setupBackgroundMusic();
+
+  // Split chars that need to be animated individually
   const textBoxChars = document.getElementsByClassName("hbd-chatbox")[0];
   const hbd = document.getElementsByClassName("wish-hbd")[0];
 
-  textBoxChars.innerHTML = `<span>${textBoxChars.innerHTML
-    .split("")
-    .join("</span><span>")}</span`;
+  if (textBoxChars) {
+    textBoxChars.innerHTML = `<span>${textBoxChars.innerHTML
+      .split("")
+      .join("</span><span>")}</span`;
+  }
 
-  hbd.innerHTML = `<span>${hbd.innerHTML
-    .split("")
-    .join("</span><span>")}</span`;
+  if (hbd) {
+    hbd.innerHTML = `<span>${hbd.innerHTML
+      .split("")
+      .join("</span><span>")}</span`;
+  }
 
   const ideaTextTrans = {
     opacity: 0,
@@ -27,6 +82,11 @@ const animationTimeline = () => {
   };
 
   const tl = new TimelineMax();
+
+  // Start music at animation start (will only succeed if browser allows)
+  tl.call(() => {
+    music.start();
+  }, null, null, 0);
 
   tl.to(".container", 0.1, {
     visibility: "visible",
@@ -265,41 +325,44 @@ const animationTimeline = () => {
       "+=1"
     );
 
-  // tl.seek("currentStep");
-  // tl.timeScale(2);
-
   // Restart Animation on click
   const replyBtn = document.getElementById("replay");
-  replyBtn.addEventListener("click", () => {
-    tl.restart();
-  });
+  if (replyBtn) {
+    replyBtn.addEventListener("click", async () => {
+      // Replay click counts as a user gesture, so music will start even on strict browsers
+      await music.start();
+      tl.restart();
+    });
+  }
 };
 
 // Import the data to customize and insert them into page
 const fetchData = () => {
-  fetch("customize.json")
-    .then((data) => data.json())
+  return fetch("customize.json")
+    .then((res) => res.json())
     .then((data) => {
-      Object.keys(data).map((customData) => {
+      Object.keys(data).forEach((customData) => {
         if (data[customData] !== "") {
           if (customData === "imagePath") {
             document
               .getElementById(customData)
               .setAttribute("src", data[customData]);
           } else {
-            document.getElementById(customData).innerText = data[customData];
+            const el = document.getElementById(customData);
+            if (el) el.innerText = data[customData];
           }
         }
       });
     });
 };
 
-// Run fetch and animation in sequence
-const resolveFetch = () => {
-  return new Promise((resolve, reject) => {
-    fetchData();
-    resolve("Fetch done!");
+// Run fetch and animation in sequence (FIXED)
+fetchData()
+  .then(() => {
+    animationTimeline();
+  })
+  .catch((err) => {
+    console.error("Failed to load customize.json:", err);
+    // Still run animation even if customize.json fails
+    animationTimeline();
   });
-};
-
-resolveFetch().then(animationTimeline());
