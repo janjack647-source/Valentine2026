@@ -12,22 +12,27 @@
 
   <body>
     <div class="container">
+
       <div class="one">
         <h1 class="one">
           Hey
           <span id="name">xyz</span>
         </h1>
-        <p class="two" id="greetingText">I really like your name btw!</p>
+        <p class="two" id="greetingText">
+          I really like your name btw!
+        </p>
       </div>
 
       <div class="three">
         <p>It's Valentine!</p>
-        <p>بعرف قديه بيعنيلك إني خبرك قديه بحبك بهاليوم وكل يوم</p>
+        <p dir="rtl" lang="ar">
+          بعرف قديه بيعنيلك إني خبرك قديه بحبك بهاليوم وكل يوم
+        </p>
       </div>
 
       <div class="four">
         <div class="text-box">
-          <p class="hbd-chatbox">
+          <p class="hbd-chatbox" dir="rtl" lang="ar">
             هابي فالانتاين يا قلبي
           </p>
           <p class="fake-btn">Send</p>
@@ -35,16 +40,27 @@
       </div>
 
       <div class="five">
-        <p class="idea-1">هاد لي كنت  لح أعمله</p>
-        <p class="idea-2">بعدين وقفت واتذكرت انك حابة تحسي إني عم ابذل جهد لوصلك مشاعري</p>
-        <p class="idea-3">
+        <p class="idea-1" dir="rtl" lang="ar">
+          هاد لي كنت لح أعمله
+        </p>
+
+        <p class="idea-2" dir="rtl" lang="ar">
+          بعدين وقفت واتذكرت انك حابة تحسي إني عم ابذل جهد لوصلك مشاعري
+        </p>
+
+        <p class="idea-3" dir="rtl" lang="ar">
           حبيت عايدك هالسنة بطريقة <strong>بتلبقلك</strong>.
         </p>
-        <p class="idea-4">لأنه</p>
-        <p class="idea-5">
+
+        <p class="idea-4" dir="rtl" lang="ar">
+          لأنه
+        </p>
+
+        <p class="idea-5" dir="rtl" lang="ar">
           بيلبقلك
           <span>:)</span>
         </p>
+
         <p class="idea-6">
           <span>S</span>
           <span>O</span>
@@ -118,13 +134,12 @@
         <p id="replay">Or click, if you want to watch it again.</p>
         <p class="last-smile">:)</p>
       </div>
+
     </div>
 
-    <!-- Scripts at the end of body = faster load -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenMax.min.js"></script>
-
-    <!-- Keep Babel ONLY if main.js truly needs it -->
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script type="text/babel" src="script/main.js"></script>
+
   </body>
 </html>
